@@ -41,6 +41,7 @@ struct QueryOptions {
   enum QueryMode {
     QueryMode_All,
     QueryMode_Duplicates,
+    QueryMode_BestDuplicates,
     QueryMode_Untagged
   };
 
@@ -51,7 +52,7 @@ struct QueryOptions {
   QString filter() const { return filter_; }
   void set_filter(const QString& filter) {
     this->filter_ = filter;
-    this->query_mode_ = QueryMode_All;
+//    this->query_mode_ = QueryMode_All;
   }
 
   int max_age() const { return max_age_; }

@@ -1121,6 +1121,7 @@ void LibraryModel::SetFilterAge(int age) {
 }
 
 void LibraryModel::SetFilterText(const QString& text) {
+  qLog(Debug) << "Setting filter text " << text;
   query_options_.set_filter(text);
   ResetAsync();
 }

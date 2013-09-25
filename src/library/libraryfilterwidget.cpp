@@ -206,8 +206,8 @@ void LibraryFilterWidget::SetFilterHint(const QString& hint) {
 }
 
 void LibraryFilterWidget::SetQueryMode(QueryOptions::QueryMode query_mode) {
-  ui_->filter->clear();
-  ui_->filter->setEnabled(query_mode == QueryOptions::QueryMode_All);
+  //ui_->filter->clear();
+  ui_->filter->setEnabled(query_mode == QueryOptions::QueryMode_All || query_mode == QueryOptions::QueryMode_BestDuplicates);
 
   model_->SetFilterQueryMode(query_mode);
 }

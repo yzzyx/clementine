@@ -458,10 +458,12 @@ MainWindow::MainWindow(Application* app,
   QActionGroup* library_view_group = new QActionGroup(this);
 
   library_show_all_ = library_view_group->addAction(tr("Show all songs"));
+  library_show_best_duplicates_ = library_view_group->addAction(tr("Show only highest quality in case of duplicates"));
   library_show_duplicates_ = library_view_group->addAction(tr("Show only duplicates"));
   library_show_untagged_ = library_view_group->addAction(tr("Show only untagged"));
 
   library_show_all_->setCheckable(true);
+  library_show_best_duplicates_->setCheckable(true);
   library_show_duplicates_->setCheckable(true);
   library_show_untagged_->setCheckable(true);
   library_show_all_->setChecked(true);
@@ -478,6 +480,7 @@ MainWindow::MainWindow(Application* app,
   separator->setSeparator(true);
 
   library_view_->filter()->AddMenuAction(library_show_all_);
+  library_view_->filter()->AddMenuAction(library_show_best_duplicates_);
   library_view_->filter()->AddMenuAction(library_show_duplicates_);
   library_view_->filter()->AddMenuAction(library_show_untagged_);
   library_view_->filter()->AddMenuAction(separator);
@@ -1978,6 +1981,8 @@ void MainWindow::PlaylistCopyToDevice() {
 void MainWindow::ChangeLibraryQueryMode(QAction* action) {
   if(action == library_show_duplicates_) {
     library_view_->filter()->SetQueryMode(QueryOptions::QueryMode_Duplicates);
+  } else if (action == library_show_best_duplicates_) {
+    library_view_->filter()->SetQueryMode(QueryOptions::QueryMode_BestDuplicates);
   } else if (action == library_show_untagged_) {
     library_view_->filter()->SetQueryMode(QueryOptions::QueryMode_Untagged);
   } else {

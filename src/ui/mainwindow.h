@@ -315,6 +315,7 @@ class MainWindow : public QMainWindow, public PlatformInterface {
 #endif
 
   QAction* library_show_all_;
+  QAction* library_show_best_duplicates_;
   QAction* library_show_duplicates_;
   QAction* library_show_untagged_;
 

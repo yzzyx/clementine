@@ -17,6 +17,7 @@
 
 #include "libraryquery.h"
 #include "core/song.h"
+#include "core/logging.h"
 
 #include <QtDebug>
 #include <QDateTime>
@@ -48,14 +49,15 @@ LibraryQuery::LibraryQuery(const QueryOptions& options)
       token.remove(')');
       token.remove('"');
 
+
       if (token.contains(':'))
         query += "fts" + token + "* ";
       else
         query += token + "* ";
     }
 
-    where_clauses_ << "fts.%fts_table_noprefix MATCH ?";
-    bound_values_ << query;
+    where_clauses_ << "fts.%fts_table_noprefix MATCH '" + query + "'";
+  //  bound_values_ << query;
     join_with_fts_ = true;
   }
 
@@ -74,6 +76,16 @@ LibraryQuery::LibraryQuery(const QueryOptions& options)
   // remember though that when you fix the Duplicates + FTS cooperation, enable the
   // filtering in both Duplicates and Untagged modes.
   duplicates_only_ = options.query_mode() == QueryOptions::QueryMode_Duplicates;
+
+  if (options.query_mode() == QueryOptions::QueryMode_BestDuplicates) {
+	  where_clauses_ << "%songs_table.rowid = (SELECT rowid FROM songs bdup WHERE "
+	      "bdup.artist = %songs_table.artist "
+	      "AND bdup.album = %songs_table.album "
+	      "AND bdup.title = %songs_table.title "
+	      "AND bdup.track = %songs_table.track "
+	      "ORDER BY bitrate DESC "
+	      "LIMIT 1)";
+  }
 
   if (options.query_mode() == QueryOptions::QueryMode_Untagged) {
     where_clauses_ << "(artist = '' OR album = '' OR title ='')";
@@ -148,10 +160,14 @@ QSqlQuery LibraryQuery::Exec(QSqlDatabase db, const QString& songs_table,
 
   query_ = QSqlQuery(sql, db);
 
+  //qLog(Debug) << "No. params SQLite wants " << query_.bind_parameter_count(aQuery);
+  qLog(Debug) << "No. of params we have: " << bound_values_.count();
+  
   // Bind values
-  foreach (const QVariant& value, bound_values_) {
+  foreach (const QVariant& value, bound_values_) { 
     query_.addBindValue(value);
   }
+  qLog(Debug) << "SQL: " << sql;
 
   query_.exec();
   return query_;
